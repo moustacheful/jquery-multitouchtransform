@@ -1,0 +1,224 @@
+<!doctype html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0" />
+	<title>jQuery Multitouch Transform plugin</title>
+	<link href='http://fonts.googleapis.com/css?family=Roboto+Condensed:300' rel='stylesheet' type='text/css'>
+	<link rel="stylesheet" href="../dist/jquery.multitouchtransform.css">
+	<link rel="stylesheet" href="css/style.css">
+	<!-- DEPENDENCIES -->
+	<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
+	<script src="dependencies/hammer.min.js"></script>
+	<script src="dependencies/transit.min.js"></script>
+	<script src="../dist/jquery.multitouchtransform.min.js"></script>
+</head>
+<style>
+	body {
+		margin: 0;
+		font-family: 'Roboto Condensed';
+	}
+	.wrapper {
+		overflow: hidden
+	}
+	/*
+	height and width of canvas must be defined
+	*/
+	.viewport {
+		width: 500px;
+		height: 500px;
+		background: url('http://www.placehold.it/500x500');
+		float: left;
+	}
+	/* 
+	All elements on canvas have the .mt-transform-element
+	Active elements on canvas have the .mt-transform-active class
+	*/
+	.viewport .mt-transform-element {
+		opacity: 0.8;
+		-webkit-transition: opacity 1s ease;
+	}
+	.viewport .mt-transform-active {
+		opacity: 1;
+	}
+	.nav {
+		float: left;
+		list-style: none;
+		padding: 0;
+		margin: 0;
+	}
+	.nav li {
+		border-bottom: 1px dotted grey;
+		height: 50px;
+		line-height: 50px;
+		padding: 0px 30px;
+		padding-left: 30px;
+	}
+
+	.nav .mt-transform-active {
+		background: rgb(231, 231, 231);
+		color: rgb(68, 68, 68);
+
+	}
+
+	.nav .mt-transform-delete {
+		color: red;
+		float: right;
+		padding-right: 30px;
+	}
+	.custom {
+		border: 3px solid #eaeaea;
+		border-radius: 10px;
+		box-shadow: 0px 0px 20px black;
+		padding: 10px;
+		background: white;
+		color: #333;
+	}
+	pre {
+		float: left;
+	}
+	.currentData {
+		position: absolute;
+		top: 0px;
+		left: 0px;
+		display: none;
+		font-size: 13px;
+		padding: 10px;
+		pointer-events: none;
+	}
+</style>
+<script>
+	$(document).ready(function(){
+		$("#viewport1").multitouchTransform({
+			//Dimensions must be defined - 612x612
+			dimensions: {
+				width: 500,
+				height: 500
+			},
+			viewportScale: 1, //Viewport scale - 1
+			//Whether or not the canvas should auto scale (listens to window resize) overrides viewportScale - true
+			autoScale: false,
+			//Navigation selector - false
+			navSelector: '.nav_1',
+			//Element initial scale upon adding - 0.5
+			elInitialScale: 1,
+			//Element scale boundaries - 0.2 to 1
+			elScaleBounds: {
+				min:0.2,
+				max:1.2
+			},
+			//on draw event
+			onDraw: function(plugin,evt){
+				$(".currentData").show();
+				if(plugin.activeElement){
+					var translate = plugin.activeElement.css('translate');
+					var scale = plugin.activeElement.css('scale').toFixed(2);
+					var rotate = parseFloat(plugin.activeElement.css('rotate')).toFixed(2);
+					$('.currentData').find('.name').text(plugin.activeElement.data('resource_id'))
+					$('.currentData').find('.coords').text(translate)
+					$('.currentData').find('.scale').text(scale)
+					$('.currentData').find('.rotation').text(rotate)
+				}
+			},
+			//on add event
+			onAdd: function(el,plugin){
+				console.log('element added:',el)
+			},
+			//on remove
+			onRemove: function(){
+				console.log('element removed');
+			},
+
+		})
+		// Add a kitten 150x150 with the name 'Cat 1'
+		$("#viewport1").multitouchTransform('add',{
+			url: "http://www.placekitten.com/150/150",
+			width: 150,
+			height: 150,
+			id: 'Cat 1'
+		})
+		// Add a kitten 200x200 with the name 'Cat 2'
+		$("#viewport1").multitouchTransform('add',{
+			url: "http://www.placekitten.com/200/200",
+			width: 200,
+			height: 200,
+			id: 'Cat 2'
+		})
+		// Add a custom HTML element
+		$("#viewport1").multitouchTransform('addCustom',$('.custom'))
+
+		//Print data : getData returns an object with all element properties
+		$(".data").click(function(evt){
+			evt.preventDefault();
+			var returnVal = JSON.stringify($("#viewport1").multitouchTransform('getData'),undefined,2)
+			$('pre').text(returnVal)
+		})
+		//Add a random cat
+		$(".add").click(function(evt){
+			evt.preventDefault();
+			var randomW = Math.ceil(Math.random()*350)+50;
+			var randomH = Math.ceil(Math.random()*350)+50;
+			$("#viewport1").multitouchTransform('add',{
+				url: "http://www.placekitten.com/"+randomW+"/"+randomH,
+				width: randomW,
+				height: randomH,
+				id: 'New cat ('+randomW+'x'+randomH+')'
+			})
+		})
+		//Disable the viewport
+		$(".disable").click(function(evt){
+			evt.preventDefault();
+			$("#viewport1").multitouchTransform('disable')
+		})
+		//Enable the viewport
+		$(".enable").click(function(evt){
+			evt.preventDefault();
+			$("#viewport1").multitouchTransform('enable')
+		})
+		//Remove active element
+		$(".remove").click(function(evt){
+			evt.preventDefault();
+			$("#viewport1").multitouchTransform('remove')
+		})
+		//Remove all elements
+		$(".clear").click(function(evt){
+			evt.preventDefault();
+			$("#viewport1").multitouchTransform('clear')
+		})
+	})
+</script>
+<body>
+	<div class="wrapper">
+		<div class="wrapper">
+			<div id="viewport1" class="viewport"></div>
+			<div class="custom">
+				This is a custom <i>element</i>!
+				<ol>
+					<li>One</li>
+					<li>Two</li>
+					<li>Three</li>
+					<li><marquee behavior="" direction="">Yay</marquee></li>
+
+				</ol>
+			</div>
+			<ul class="nav_1 nav"></ul>
+		</div>
+		<a href="#" class="add">Add a new cat</a>
+		<a href="#" class="data">Print data</a>
+		<a href="#" class="disable">Disable canvas</a>
+		<a href="#" class="enable">Enable canvas</a>
+		<a href="#" class="remove">Remove current</a>
+		<a href="#" class="clear">Remove all</a>
+		<div class="currentData">
+			Current element: <i><b class="name"></b></i>
+			<ul>
+				<li>My coords: <span class="coords">0px,0px</span></li>
+				<li>My scale: <span class="scale">1</span></li>
+				<li>My rotation: <span class="rotation">1</span></li>
+			</ul>
+		</div>
+
+	</div>
+	<pre></pre>
+</body>
+</html>

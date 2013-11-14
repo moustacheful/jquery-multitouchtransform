@@ -1,0 +1,19 @@
+{
+  "name": "jquery.multitouchtransform",
+  "version": "1.0.0",
+  "description": "A jquery plugin for transforming elements on a canvas using multitouch events and CSS3 transformations",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Daniel Acuna",
+  "license": "BSD-2-Clause",
+  "devDependencies": {
+    "grunt": "~0.4.1",
+    "grunt-contrib-copy": "~0.4.1",
+    "grunt-contrib-uglify": "~0.2.5",
+    "grunt-beautify": "~0.1.1",
+    "grunt-jsbeautifier": "~0.2.3",
+    "grunt-autoprefixer": "~0.4.0"
+  }
+}

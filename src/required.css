@@ -1,0 +1,10 @@
+.mt-transform-viewport {
+	overflow: hidden;
+}
+.mt-transform-element {
+	backface-visibility: hidden;
+	perspective: 1000;
+	transform-origin: center center;
+	position: absolute;
+	pointer-events: none;
+}
